@@ -6,7 +6,7 @@ from .DbClassOperator import DbClassOperator, NoSuchElement
 from .DbClassOperators import DbClassOperators
 
 
-class DbOperator:
+class MongoDbOperator:
     def __init__(self, db: Database):
         self.known_classes: dict[Type[DbClass], DbClassOperator] = DbClassOperators(db)
 
