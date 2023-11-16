@@ -5,7 +5,7 @@ from db_classes import DbClass
 from .DbClassOperator import DbClassOperator, NoSuchElement
 from .DbClassOperators import DbClassOperators
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class MongoDbOperator:

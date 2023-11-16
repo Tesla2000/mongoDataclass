@@ -23,7 +23,9 @@ class DbClassOperator:
     def load(self, object_id: Any) -> DbClass:
         document = self.collection.find_one({"_id": str(object_id)})
         if not document:
-            raise NoSuchElement(f"No element with _id={object_id} in the collection_name={self.collection_name}")
+            raise NoSuchElement(
+                f"No element with _id={object_id} in the collection_name={self.collection_name}"
+            )
         return self._conv_to_element(document)
 
     def load_all(self) -> Iterable[DbClass]:
@@ -32,10 +34,12 @@ class DbClassOperator:
 
     def update(self, element: DbClass):
         all_fields = element.get_db_representation()
-        _id = all_fields.pop('_id')
+        _id = all_fields.pop("_id")
         result = self.collection.update_one({"_id": _id}, {"$set": all_fields})
         if result.modified_count != 1:
-            raise NoSuchElement(f"No element with {_id=} in the collection_name={self.collection_name}")
+            raise NoSuchElement(
+                f"No element with {_id=} in the collection_name={self.collection_name}"
+            )
 
     def write(self, element: DbClass):
         self.collection.insert_one(element.get_db_representation())
