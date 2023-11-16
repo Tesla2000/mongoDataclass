@@ -8,6 +8,8 @@ from db_classes import DbClass
 class DbClassOperator:
     def __init__(self, db: Database, operated_class: Type[DbClass]):
         self.db = db
+        if not issubclass(operated_class, DbClass):
+            raise ValueError(f"{operated_class=} must be a subclass of DbClass")
         self.operated_class = operated_class
         self.collection_name = operated_class.__name__
         self.collection = self.db[self.collection_name]
