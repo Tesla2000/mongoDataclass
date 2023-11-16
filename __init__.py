@@ -1,8 +1,8 @@
 __all__ = [
     "MongoDbOperator",
     "DbClass",
-    "ImplementingFromDict",
+    "DbClassLiteral",
 ]
 
-from .db_class import DbClass, ImplementingFromDict
+from db_classes import DbClass, DbClassLiteral
 from .MongoDbOperator import MongoDbOperator

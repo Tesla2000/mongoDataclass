@@ -1,9 +1,11 @@
-from typing import Type, T, Iterable
+from typing import Type, Iterable, TypeVar
 
 from pymongo.database import Database
-from db_class import DbClass
+from db_classes import DbClass
 from .DbClassOperator import DbClassOperator, NoSuchElement
 from .DbClassOperators import DbClassOperators
+
+T = TypeVar('T')
 
 
 class MongoDbOperator:

@@ -1,10 +1,8 @@
 from typing import Type, Any, Iterable
 
-from dacite import from_dict
 from pymongo.database import Database
 
-from db_class import DbClass
-from db_class import ImplementingFromDict
+from db_classes import DbClass
 
 
 class DbClassOperator:
@@ -31,22 +29,19 @@ class DbClassOperator:
         return map(self._conv_to_element, docs)
 
     def update(self, element: DbClass):
-        all_fields = element.serialize()
+        all_fields = element.get_db_representation()
         _id = all_fields.pop('_id')
         result = self.collection.update_one({"_id": _id}, {"$set": all_fields})
         if result.modified_count != 1:
             raise NoSuchElement(f"No element with {_id=} in the collection_name={self.collection_name}")
 
     def write(self, element: DbClass):
-        self.collection.insert_one(element.serialize())
+        self.collection.insert_one(element.get_db_representation())
         return element
 
     def _conv_to_element(self, doc) -> DbClass:
         dict_repr = dict(doc)
-        if issubclass(self.operated_class, ImplementingFromDict):
-            element = self.operated_class.from_dict(dict_repr)
-        else:
-            element = from_dict(self.operated_class, dict_repr)
+        element = self.operated_class.from_dict(dict_repr)
         return element
 
 
