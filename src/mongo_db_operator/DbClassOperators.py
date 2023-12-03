@@ -1,7 +1,7 @@
 from pymongo.database import Database
 
 from .DbClassOperator import DbClassOperator
-from db_classes import DbClass
+from seriattrs import DbClass
 
 
 class DbClassOperators(dict):

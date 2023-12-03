@@ -2,7 +2,7 @@ from typing import Type, Any, Iterable
 
 from pymongo.database import Database
 
-from db_classes import DbClass
+from seriattrs import DbClass
 
 
 class DbClassOperator:

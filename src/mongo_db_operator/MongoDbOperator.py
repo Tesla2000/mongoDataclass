@@ -1,7 +1,7 @@
 from typing import Type, Iterable, TypeVar
 
 from pymongo.database import Database
-from db_classes import DbClass
+from seriattrs import DbClass
 from .DbClassOperator import DbClassOperator, NoSuchElement
 from .DbClassOperators import DbClassOperators
 
