@@ -17,13 +17,13 @@ class DbClassOperator:
     def delete(self, element: DbClass):
         result = self.collection.delete_one({"_id": str(element._id)})
         if result.deleted_count != 1:
-            raise NoSuchElement(f"No {element=} present in the database")
+            raise NoSuchElementException(f"No {element=} present in the database")
         del element
 
     def load(self, object_id: Any) -> DbClass:
         document = self.collection.find_one({"_id": str(object_id)})
         if not document:
-            raise NoSuchElement(
+            raise NoSuchElementException(
                 f"No element with _id={object_id} in the collection_name={self.collection_name}"
             )
         return self._conv_to_element(document)
@@ -37,7 +37,7 @@ class DbClassOperator:
         _id = all_fields.pop("_id")
         result = self.collection.update_one({"_id": _id}, {"$set": all_fields})
         if result.modified_count != 1:
-            raise NoSuchElement(
+            raise NoSuchElementException(
                 f"No element with {_id=} in the collection_name={self.collection_name}"
             )
 
@@ -51,5 +51,5 @@ class DbClassOperator:
         return element
 
 
-class NoSuchElement(ValueError):
+class NoSuchElementException(ValueError):
     pass

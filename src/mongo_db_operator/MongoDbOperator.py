@@ -2,10 +2,10 @@ from typing import Type, Iterable, TypeVar
 
 from pymongo.database import Database
 from seriattrs import DbClass
-from .DbClassOperator import DbClassOperator, NoSuchElement
+from .DbClassOperator import DbClassOperator, NoSuchElementException
 from .DbClassOperators import DbClassOperators
 
-T = TypeVar("T")
+T = TypeVar("T", bound=DbClass)
 
 
 class MongoDbOperator:
@@ -21,7 +21,7 @@ class MongoDbOperator:
     def load_or_default(self, element_class: T, element_id: str, default=None) -> T:
         try:
             return self.load(element_class, element_id)
-        except NoSuchElement:
+        except NoSuchElementException:
             return default
 
     def load_all(self, element_class: Type[T]) -> Iterable[T]:
