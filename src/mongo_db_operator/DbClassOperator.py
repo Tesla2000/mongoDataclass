@@ -33,7 +33,7 @@ class DbClassOperator:
         return map(self._conv_to_element, docs)
 
     def update(self, element: DbClass):
-        all_fields = element.get_db_representation()
+        all_fields = element.serialize()
         _id = all_fields.pop("_id")
         result = self.collection.update_one({"_id": _id}, {"$set": all_fields})
         if result.modified_count != 1:
@@ -42,12 +42,12 @@ class DbClassOperator:
             )
 
     def write(self, element: DbClass):
-        self.collection.insert_one(element.get_db_representation())
+        self.collection.insert_one(element.serialize())
         return element
 
     def _conv_to_element(self, doc) -> DbClass:
         dict_repr = dict(doc)
-        element = self.operated_class.from_dict(dict_repr)
+        element = self.operated_class.deserialize(dict_repr)
         return element
 
 
