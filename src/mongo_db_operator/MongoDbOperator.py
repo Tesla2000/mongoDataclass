@@ -1,25 +1,26 @@
 from threading import Thread
-from typing import Type, Iterable, TypeVar, Any, Sequence
+from typing import Type, Iterable, Any, Sequence, TypeVar
 
 from pymongo.database import Database
 from seriattrs import DbClass
+
 from .DbClassOperator import DbClassOperator, NoSuchElementException
 from .DbClassOperators import DbClassOperators
 
-T = TypeVar("T", bound=DbClass)
+T = TypeVar('T', bound=DbClass)
 
 
 class MongoDbOperator:
     def __init__(self, db: Database):
-        self.known_classes: dict[Type[DbClass], DbClassOperator] = DbClassOperators(db)
+        self.known_classes: dict[Type[T], DbClassOperator] = DbClassOperators(db)
 
-    def delete(self, element: DbClass):
+    def delete(self, element: T):
         self.known_classes[type(element)].delete(element)
 
-    def load(self, element_class: T, element_id: Any) -> T:
+    def load(self, element_class: Type[T], element_id: Any) -> T:
         return self.known_classes[element_class].load(element_id)
 
-    def load_multiple(self, element_class: T, element_ids: Sequence[Any]) -> list[T]:
+    def load_multiple(self, element_class: Type[T], element_ids: Sequence[Any]) -> list[T]:
         results = [T for _ in element_ids]
         threads = tuple(
             Thread(target=lambda index, element_id: results.__setitem__(
@@ -28,7 +29,7 @@ class MongoDbOperator:
         tuple(map(Thread.join, threads))
         return results
 
-    def load_or_default(self, element_class: T, element_id: Any, default=None) -> T:
+    def load_or_default(self, element_class: Type[T], element_id: Any, default=None) -> T:
         try:
             return self.load(element_class, element_id)
         except NoSuchElementException:

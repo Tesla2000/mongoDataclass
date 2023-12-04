@@ -1,12 +1,14 @@
-from typing import Type, Any, Iterable
+from typing import Type, Any, Iterable, TypeVar
 
 from pymongo.database import Database
 
 from seriattrs import DbClass
 
+T = TypeVar('T', bound=DbClass)
+
 
 class DbClassOperator:
-    def __init__(self, db: Database, operated_class: Type[DbClass]):
+    def __init__(self, db: Database, operated_class: Type[T]):
         self.db = db
         if not issubclass(operated_class, DbClass):
             raise ValueError(f"{operated_class=} must be a subclass of DbClass")
@@ -14,13 +16,13 @@ class DbClassOperator:
         self.collection_name = operated_class.__name__
         self.collection = self.db[self.collection_name]
 
-    def delete(self, element: DbClass):
+    def delete(self, element: T):
         result = self.collection.delete_one({"_id": str(element._id)})
         if result.deleted_count != 1:
             raise NoSuchElementException(f"No {element=} present in the database")
         del element
 
-    def load(self, object_id: Any) -> DbClass:
+    def load(self, object_id: Any) -> T:
         document = self.collection.find_one({"_id": str(object_id)})
         if not document:
             raise NoSuchElementException(
@@ -28,11 +30,11 @@ class DbClassOperator:
             )
         return self._conv_to_element(document)
 
-    def load_all(self) -> Iterable[DbClass]:
+    def load_all(self) -> Iterable[T]:
         docs = self.collection.find()
         return map(self._conv_to_element, docs)
 
-    def update(self, element: DbClass):
+    def update(self, element: T) -> T:
         all_fields = element.serialize()
         _id = all_fields.pop("_id")
         result = self.collection.update_one({"_id": _id}, {"$set": all_fields})
@@ -40,12 +42,13 @@ class DbClassOperator:
             raise NoSuchElementException(
                 f"No element with {_id=} in the collection_name={self.collection_name}"
             )
+        return element
 
-    def write(self, element: DbClass):
+    def write(self, element: T) -> T:
         self.collection.insert_one(element.serialize())
         return element
 
-    def _conv_to_element(self, doc) -> DbClass:
+    def _conv_to_element(self, doc) -> T:
         dict_repr = dict(doc)
         element = self.operated_class.deserialize(dict_repr)
         return element
