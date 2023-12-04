@@ -16,11 +16,16 @@ class DbClassOperator:
         self.collection_name = operated_class.__name__
         self.collection = self.db[self.collection_name]
 
-    def delete(self, element: T):
+    def delete(self, element: T) -> None:
         result = self.collection.delete_one({"_id": str(element._id)})
         if result.deleted_count != 1:
             raise NoSuchElementException(f"No {element=} present in the database")
         del element
+
+    def delete_by_id(self, element_id: Any) -> None:
+        result = self.collection.delete_one({"_id": str(element_id)})
+        if result.deleted_count != 1:
+            raise NoSuchElementException(f"No element with {element_id=} present in the database")
 
     def load(self, object_id: Any) -> T:
         document = self.collection.find_one({"_id": str(object_id)})
