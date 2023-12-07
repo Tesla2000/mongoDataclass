@@ -2,7 +2,7 @@ from typing import Type, Any, Iterable, TypeVar
 
 from pymongo.database import Database
 
-from seriattrs import DbClass
+from seriattrs.src.seriattrs import DbClass
 
 T = TypeVar('T', bound=DbClass)
 

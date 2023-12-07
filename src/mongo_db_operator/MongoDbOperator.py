@@ -2,8 +2,8 @@ from threading import Thread
 from typing import Type, Iterable, Any, Sequence, TypeVar
 
 from pymongo.database import Database
-from seriattrs import DbClass
 
+from seriattrs.src.seriattrs import DbClass
 from .DbClassOperator import DbClassOperator, NoSuchElementException
 from .DbClassOperators import DbClassOperators
 
