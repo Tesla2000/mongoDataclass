@@ -17,18 +17,18 @@ class DbClassOperator:
         self.collection = self.db[self.collection_name]
 
     def delete(self, element: T) -> None:
-        result = self.collection.delete_one({"_id": str(element._id)})
+        result = self.collection.delete_one({"_id": element._id})
         if result.deleted_count != 1:
             raise NoSuchElementException(f"No {element=} present in the database")
         del element
 
     def delete_by_id(self, element_id: Any) -> None:
-        result = self.collection.delete_one({"_id": str(element_id)})
+        result = self.collection.delete_one({"_id": element_id})
         if result.deleted_count != 1:
             raise NoSuchElementException(f"No element with {element_id=} present in the database")
 
     def load(self, object_id: Any) -> T:
-        document = self.collection.find_one({"_id": str(object_id)})
+        document = self.collection.find_one({"_id": object_id})
         if not document:
             raise NoSuchElementException(
                 f"No element with _id={object_id} in the collection_name={self.collection_name}"
@@ -42,11 +42,7 @@ class DbClassOperator:
     def update(self, element: T) -> T:
         all_fields = element.serialize()
         _id = all_fields.pop("_id")
-        result = self.collection.update_one({"_id": _id}, {"$set": all_fields})
-        if result.modified_count != 1:
-            raise NoSuchElementException(
-                f"No element with {_id=} in the collection_name={self.collection_name}"
-            )
+        self.collection.update_one({"_id": _id}, {"$set": all_fields})
         return element
 
     def write(self, element: T) -> T:

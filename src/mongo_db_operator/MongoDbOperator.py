@@ -29,8 +29,12 @@ class MongoDbOperator:
         threads = tuple(
             Thread(target=lambda index, element_id: results.__setitem__(
                 index, self._known_classes[element_class].load(element_id)),
-                   args=(index, element_id)).start() for index, element_id in enumerate(element_ids))
-        tuple(map(Thread.join, threads))
+                   args=(index, element_id)) for index, element_id in enumerate(element_ids))
+        try:
+            tuple(map(Thread.start, threads))
+            tuple(map(Thread.join, threads))
+        except:
+            pass
         return results
 
     def load_or_default(self, element_class: Type[T], element_id: Any, default=None) -> T:
