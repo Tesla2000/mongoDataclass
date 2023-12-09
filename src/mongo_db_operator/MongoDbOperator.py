@@ -25,7 +25,10 @@ class MongoDbOperator:
         return self._known_classes[element_class].load(element_id)
 
     def load_multiple(self, element_class: Type[T], element_ids: Sequence[Any]) -> list[T]:
-        results = [T for _ in element_ids]
+        try:
+            results = [T for _ in element_ids]
+        except:
+            pass
         threads = tuple(
             Thread(target=lambda index, element_id: results.__setitem__(
                 index, self._known_classes[element_class].load(element_id)),
