@@ -33,11 +33,11 @@ class DbClassOperator:
             raise NoSuchElementException(
                 f"No element with _id={object_id} in the collection_name={self.collection_name}"
             )
-        return self._conv_to_element(document)
+        return self.conv_to_dbclass(document)
 
     def load_all(self) -> Iterable[T]:
         docs = self.collection.find()
-        return map(self._conv_to_element, docs)
+        return map(self.conv_to_dbclass, docs)
 
     def update(self, element: T) -> T:
         all_fields = element.serialize()
@@ -49,7 +49,7 @@ class DbClassOperator:
         self.collection.insert_one(element.serialize())
         return element
 
-    def _conv_to_element(self, doc) -> T:
+    def conv_to_dbclass(self, doc) -> T:
         dict_repr = dict(doc)
         element = self.operated_class.deserialize(dict_repr)
         return element

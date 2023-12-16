@@ -33,11 +33,8 @@ class MongoDbOperator:
             Thread(target=lambda index, element_id: results.__setitem__(
                 index, self._known_classes[element_class].load(element_id)),
                    args=(index, element_id)) for index, element_id in enumerate(element_ids))
-        try:
-            tuple(map(Thread.start, threads))
-            tuple(map(Thread.join, threads))
-        except:
-            pass
+        tuple(map(Thread.start, threads))
+        tuple(map(Thread.join, threads))
         return results
 
     def load_or_default(self, element_class: Type[T], element_id: Any, default=None) -> T:
@@ -45,6 +42,9 @@ class MongoDbOperator:
             return self.load(element_class, element_id)
         except NoSuchElementException:
             return default
+
+    def conv_to_dbclass(self, element_class: Type[T], doc) -> T:
+        return self._known_classes[element_class].conv_to_dbclass(doc)
 
     def load_all(self, element_class: Type[T]) -> Iterable[T]:
         return self._known_classes[element_class].load_all()
