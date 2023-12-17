@@ -1,6 +1,6 @@
 from pymongo.database import Database
+from seriattrs import DbClass
 
-from seriattrs.src.seriattrs import DbClass
 from .DbClassOperator import DbClassOperator
 
 

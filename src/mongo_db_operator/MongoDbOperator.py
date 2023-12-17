@@ -2,9 +2,9 @@ from threading import Thread
 from typing import Type, Iterable, Any, Sequence, TypeVar
 
 from pymongo.database import Database
+from seriattrs import DbClass
 
-from seriattrs.src.seriattrs import DbClass
-from .DbClassOperator import DbClassOperator, NoSuchElementException
+from .DbClassOperator import NoSuchElementException
 from .DbClassOperators import DbClassOperators
 
 T = TypeVar('T', bound=DbClass)
@@ -13,7 +13,7 @@ T = TypeVar('T', bound=DbClass)
 class MongoDbOperator:
     def __init__(self, db: Database):
         self.db = db
-        self._known_classes: dict[Type[T], DbClassOperator] = DbClassOperators(db)
+        self._known_classes = DbClassOperators(db)
 
     def delete(self, element: T) -> None:
         self._known_classes[type(element)].delete(element)
