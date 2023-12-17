@@ -7,13 +7,13 @@ def connect(
     host: str = "localhost",
     username: str = None,
     password: str = None,
-    port=27017,
+    port: int = 27017,
 ) -> Database:
     if username and password:
         connection_string = (
-            f"mongodb://{username}:{password}@{host}:{port}"
+            "mongodb://{}:{}@{}:{}".format(username, password, host, port)
         )
     else:
-        connection_string = f"mongodb://{host}:{port}"
+        connection_string = "mongodb://{}:{}".format(host, port)
     client = MongoClient(connection_string)
     return client[database_name]
