@@ -53,28 +53,28 @@ class MongoDbOperator:
             collection = self.db[collection_name]
             collection.delete_many({})
 
-    def export_csv(self, path: Path, exported_classes: list[Type[DbClass]] = None):
+    def export_as_json(self, path: Path, exported_classes: list[Type[DbClass]] = None):
         if not path.is_dir():
             raise ValueError(f"{path=} you are trying to export data to is not a directory")
         if exported_classes is None:
-            exported_classes = DbClass.__subclasses__()
+            exported_classes = self._known_classes.keys()
         for exported_class in exported_classes:
             if exported_class not in self._known_classes:
                 warn(f"{exported_class=} not in database. Skipping.")
                 continue
-            export_path = path.joinpath(exported_class.__name__)
+            export_path = path.joinpath(exported_class.__name__).with_suffix('.json')
             operator = self._known_classes[exported_class]
-            operator.export_csv(export_path)
+            operator.export_as_json(export_path)
 
-    def load_from_csv(self, path: Path, imported_classes: list[Type[DbClass]] = None):
+    def load_from_json(self, path: Path, imported_classes: list[Type[DbClass]] = None):
         if not path.is_dir():
             raise ValueError(f"{path=} you are trying to export data to is not a directory")
         if imported_classes is None:
-            imported_classes = DbClass.__subclasses__()
+            imported_classes = self._known_classes.keys()
         for imported_class in imported_classes:
-            if imported_class not in DbClass.__subclasses__():
+            if imported_class not in self._known_classes:
                 warn(f"{imported_class=} not in database. Skipping.")
                 continue
-            export_path = path.joinpath(imported_class.__name__)
+            export_path = path.joinpath(imported_class.__name__).with_suffix('.json')
             operator = self._known_classes[imported_class]
-            operator.load_from_csv(export_path)
+            operator.load_from_json(export_path)
