@@ -1,5 +1,6 @@
-from threading import Thread
+from pathlib import Path
 from typing import Type, Iterable, Any, Sequence, TypeVar
+from warnings import warn
 
 from pymongo.database import Database
 from seriattrs import DbClass
@@ -25,17 +26,7 @@ class MongoDbOperator:
         return self._known_classes[element_class].load(element_id)
 
     def load_multiple(self, element_class: Type[T], element_ids: Sequence[Any]) -> list[T]:
-        try:
-            results = [T for _ in element_ids]
-        except:
-            pass
-        threads = tuple(
-            Thread(target=lambda index, element_id: results.__setitem__(
-                index, self._known_classes[element_class].load(element_id)),
-                   args=(index, element_id)) for index, element_id in enumerate(element_ids))
-        tuple(map(Thread.start, threads))
-        tuple(map(Thread.join, threads))
-        return results
+        return self._known_classes[element_class].load_multiple(element_ids)
 
     def load_or_default(self, element_class: Type[T], element_id: Any, default=None) -> T:
         try:
@@ -61,3 +52,29 @@ class MongoDbOperator:
         for collection_name in collection_names:
             collection = self.db[collection_name]
             collection.delete_many({})
+
+    def export_csv(self, path: Path, exported_classes: list[Type[DbClass]] = None):
+        if not path.is_dir():
+            raise ValueError(f"{path=} you are trying to export data to is not a directory")
+        if exported_classes is None:
+            exported_classes = DbClass.__subclasses__()
+        for exported_class in exported_classes:
+            if exported_class not in self._known_classes:
+                warn(f"{exported_class=} not in database. Skipping.")
+                continue
+            export_path = path.joinpath(exported_class.__name__)
+            operator = self._known_classes[exported_class]
+            operator.export_csv(export_path)
+
+    def load_from_csv(self, path: Path, imported_classes: list[Type[DbClass]] = None):
+        if not path.is_dir():
+            raise ValueError(f"{path=} you are trying to export data to is not a directory")
+        if imported_classes is None:
+            imported_classes = DbClass.__subclasses__()
+        for imported_class in imported_classes:
+            if imported_class not in DbClass.__subclasses__():
+                warn(f"{imported_class=} not in database. Skipping.")
+                continue
+            export_path = path.joinpath(imported_class.__name__)
+            operator = self._known_classes[imported_class]
+            operator.load_from_csv(export_path)

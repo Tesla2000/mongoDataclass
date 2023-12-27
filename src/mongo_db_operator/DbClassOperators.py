@@ -1,3 +1,5 @@
+from typing import Type
+
 from pymongo.database import Database
 from seriattrs import DbClass
 
@@ -11,7 +13,7 @@ class DbClassOperators(dict):
             dictionary = {}
         super().__init__(dict(**dictionary, **kwargs))
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: Type[DbClass]) -> DbClassOperator:
         if not issubclass(item, DbClass):
             raise ValueError("Item must be a subclass of DbClass")
         try:
